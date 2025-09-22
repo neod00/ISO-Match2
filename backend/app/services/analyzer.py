@@ -5,12 +5,14 @@
 import re
 from urllib.parse import urlparse
 from typing import Dict, List, Optional
+from .crawler import CrawlerService
 
 class CompanyAnalyzer:
     """기업 분석 서비스 클래스"""
     
     def __init__(self):
         self.analyzer_name = "InsightMatch2 Analyzer"
+        self.crawler = CrawlerService()
     
     def analyze(self, homepage: str, email: str) -> Dict:
         """
@@ -27,7 +29,11 @@ class CompanyAnalyzer:
             # 기업명 추출
             company_name = self.extract_company_name(homepage)
             
-            # 기본 분석 결과 (더미 데이터)
+            # 공개정보 수집
+            print(f"🔍 {company_name} 공개정보 수집 시작...")
+            public_data = self.crawler.crawl_public_data(homepage, company_name)
+            
+            # 분석 결과 생성
             result = {
                 'company': company_name,
                 'homepage': homepage,
@@ -47,11 +53,13 @@ class CompanyAnalyzer:
                     'ISO 27701',
                     'GDPR 컴플라이언스'
                 ],
-                'news': self._get_sample_news(company_name),
-                'dart': self._get_sample_dart(company_name),
-                'social': self._get_sample_social(company_name),
+                'news': public_data.get('news', []),
+                'dart': public_data.get('dart', []),
+                'social': public_data.get('social', []),
+                'website': public_data.get('website', {}),
                 'analysis_date': self._get_current_date(),
-                'confidence_score': 0.85
+                'confidence_score': 0.85,
+                'crawl_status': public_data.get('status', 'unknown')
             }
             
             return result
