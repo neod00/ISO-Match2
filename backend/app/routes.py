@@ -5,6 +5,7 @@ InsightMatch2 API Routes
 from flask import Blueprint, request, jsonify
 from app.services.analyzer import CompanyAnalyzer
 from app.services.consultant_service import ConsultantService
+from app.services.recommendation_service import RecommendationService
 
 # 블루프린트 생성
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -12,6 +13,7 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 # 서비스 인스턴스
 analyzer = CompanyAnalyzer()
 consultant_service = ConsultantService()
+recommendation_service = RecommendationService()
 
 @api_bp.route('/health', methods=['GET'])
 def health_check():
@@ -93,4 +95,48 @@ def register_consultant():
     except Exception as e:
         return jsonify({
             'error': f'컨설턴트 등록 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@api_bp.route('/recommendations', methods=['POST'])
+def get_recommendations():
+    """컨설턴트 추천 API"""
+    try:
+        data = request.get_json()
+        company_name = data.get('company_name', '').strip()
+        
+        if not company_name:
+            return jsonify({
+                'error': '기업명이 필요합니다.'
+            }), 400
+        
+        # 추천 실행
+        result = recommendation_service.get_recommendations_by_company(company_name)
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'추천 생성 중 오류가 발생했습니다: {str(e)}'
+        }), 500
+
+@api_bp.route('/recommendations/criteria', methods=['POST'])
+def get_recommendations_by_criteria():
+    """기준별 컨설턴트 추천 API"""
+    try:
+        data = request.get_json()
+        
+        # 추천 실행
+        result = recommendation_service.get_recommendations_by_criteria(
+            industry=data.get('industry', ''),
+            certifications=data.get('certifications', []),
+            region=data.get('region', ''),
+            min_experience=data.get('min_experience', 0),
+            limit=data.get('limit', 5)
+        )
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'기준별 추천 생성 중 오류가 발생했습니다: {str(e)}'
         }), 500

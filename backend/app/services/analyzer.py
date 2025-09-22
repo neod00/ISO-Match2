@@ -8,6 +8,7 @@ from typing import Dict, List, Optional
 from .crawler import CrawlerService
 from .ai_analyzer import AIAnalyzer
 from .database_service import DatabaseService
+from .recommendation_service import RecommendationService
 from app.models.company import Company
 from app.models.analysis import Analysis
 
@@ -19,6 +20,7 @@ class CompanyAnalyzer:
         self.crawler = CrawlerService()
         self.ai_analyzer = AIAnalyzer()
         self.db_service = DatabaseService()
+        self.recommendation_service = RecommendationService()
     
     def analyze(self, homepage: str, email: str) -> Dict:
         """
@@ -62,7 +64,18 @@ class CompanyAnalyzer:
             }
             
             # 데이터베이스에 저장
-            self._save_analysis_to_db(company_name, homepage, email, result, public_data, ai_analysis)
+            saved_analysis = self._save_analysis_to_db(company_name, homepage, email, result, public_data, ai_analysis)
+            
+            # 컨설턴트 추천 추가
+            if saved_analysis:
+                try:
+                    recommendations = self.recommendation_service.get_recommendations(saved_analysis, limit=3)
+                    result['recommendations'] = recommendations.get('recommendations', [])
+                    result['recommendation_summary'] = recommendations.get('summary', {})
+                except Exception as e:
+                    print(f"⚠️ 추천 생성 실패: {str(e)}")
+                    result['recommendations'] = []
+                    result['recommendation_summary'] = {}
             
             return result
             
@@ -250,11 +263,14 @@ class CompanyAnalyzer:
             saved_analysis = self.db_service.create_analysis(analysis)
             if saved_analysis:
                 print(f"✅ {company_name} 분석 결과가 데이터베이스에 저장되었습니다.")
+                return saved_analysis
             else:
                 print(f"❌ {company_name} 분석 결과 저장 실패")
+                return None
                 
         except Exception as e:
             print(f"❌ 데이터베이스 저장 중 오류: {str(e)}")
+            return None
     
     def _get_current_date(self) -> str:
         """현재 날짜 반환"""
