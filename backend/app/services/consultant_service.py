@@ -3,11 +3,14 @@
 """
 
 from typing import Dict, List, Optional
+from .database_service import DatabaseService
+from app.models.consultant import Consultant
 
 class ConsultantService:
     """컨설턴트 서비스 클래스"""
     
     def __init__(self):
+        self.db_service = DatabaseService()
         self.consultants_db = self._initialize_consultants_db()
     
     def get_consultants(self, industry: str = '', certification: str = '', region: str = '') -> List[Dict]:
@@ -22,6 +25,15 @@ class ConsultantService:
         Returns:
             List[Dict]: 필터링된 컨설턴트 목록
         """
+        # 데이터베이스에서 조회 시도
+        if self.db_service.is_available():
+            try:
+                consultants = self.db_service.get_consultants(industry, certification, region)
+                return [consultant.to_dict() for consultant in consultants]
+            except Exception as e:
+                print(f"❌ 데이터베이스 조회 실패, 로컬 데이터 사용: {str(e)}")
+        
+        # 로컬 데이터 사용
         filtered_consultants = self.consultants_db.copy()
         
         # 업종 필터링
@@ -54,32 +66,44 @@ class ConsultantService:
             if field not in data or not data[field]:
                 raise ValueError(f'{field} 필드가 필요합니다.')
         
-        # 새 컨설턴트 ID 생성
+        # 컨설턴트 객체 생성
+        consultant = Consultant(
+            name=data['name'],
+            email=data['email'],
+            phone=data.get('phone'),
+            industry=data['industry'],
+            region=data.get('region', '서울'),
+            years_experience=data.get('years', 0),
+            certifications=data['certifications'],
+            description=data.get('description', ''),
+            status='pending'
+        )
+        
+        # 데이터베이스에 저장 시도
+        if self.db_service.is_available():
+            try:
+                saved_consultant = self.db_service.create_consultant(consultant)
+                if saved_consultant:
+                    return {
+                        'id': saved_consultant.id,
+                        'name': saved_consultant.name,
+                        'email': saved_consultant.email,
+                        'status': saved_consultant.status
+                    }
+            except Exception as e:
+                print(f"❌ 데이터베이스 저장 실패, 로컬 저장: {str(e)}")
+        
+        # 로컬 저장 (폴백)
         new_id = max([c['id'] for c in self.consultants_db], default=0) + 1
-        
-        # 컨설턴트 정보 생성
-        consultant = {
-            'id': new_id,
-            'name': data['name'],
-            'email': data['email'],
-            'industry': data['industry'],
-            'region': data.get('region', '서울'),
-            'certifications': data['certifications'],
-            'rating': 0.0,
-            'years': data.get('years', 0),
-            'description': data.get('description', ''),
-            'phone': data.get('phone', ''),
-            'status': 'pending'  # 승인 대기 상태
-        }
-        
-        # 데이터베이스에 추가 (실제로는 DB에 저장)
-        self.consultants_db.append(consultant)
+        consultant_dict = consultant.to_dict()
+        consultant_dict['id'] = new_id
+        self.consultants_db.append(consultant_dict)
         
         return {
-            'id': consultant['id'],
-            'name': consultant['name'],
-            'email': consultant['email'],
-            'status': consultant['status']
+            'id': consultant_dict['id'],
+            'name': consultant_dict['name'],
+            'email': consultant_dict['email'],
+            'status': consultant_dict['status']
         }
     
     def _initialize_consultants_db(self) -> List[Dict]:

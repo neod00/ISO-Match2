@@ -7,6 +7,9 @@ from urllib.parse import urlparse
 from typing import Dict, List, Optional
 from .crawler import CrawlerService
 from .ai_analyzer import AIAnalyzer
+from .database_service import DatabaseService
+from app.models.company import Company
+from app.models.analysis import Analysis
 
 class CompanyAnalyzer:
     """기업 분석 서비스 클래스"""
@@ -15,6 +18,7 @@ class CompanyAnalyzer:
         self.analyzer_name = "InsightMatch2 Analyzer"
         self.crawler = CrawlerService()
         self.ai_analyzer = AIAnalyzer()
+        self.db_service = DatabaseService()
     
     def analyze(self, homepage: str, email: str) -> Dict:
         """
@@ -56,6 +60,9 @@ class CompanyAnalyzer:
                 'analysis_method': ai_analysis.get('analysis_method', 'Unknown'),
                 'crawl_status': public_data.get('status', 'unknown')
             }
+            
+            # 데이터베이스에 저장
+            self._save_analysis_to_db(company_name, homepage, email, result, public_data, ai_analysis)
             
             return result
             
@@ -195,6 +202,59 @@ class CompanyAnalyzer:
                 formatted_certs.append(str(cert))
         
         return formatted_certs[:10]  # 최대 10개
+    
+    def _save_analysis_to_db(self, company_name: str, homepage: str, email: str, result: Dict, public_data: Dict, ai_analysis: Dict):
+        """분석 결과를 데이터베이스에 저장"""
+        try:
+            if not self.db_service.is_available():
+                print("⚠️ 데이터베이스가 사용 불가능합니다. 분석 결과를 저장하지 않습니다.")
+                return
+            
+            # 기업 정보 저장 또는 업데이트
+            company = Company(
+                name=company_name,
+                homepage=homepage,
+                email=email,
+                website_info=public_data.get('website', {})
+            )
+            
+            existing_company = self.db_service.get_company_by_homepage(homepage)
+            if existing_company:
+                company.id = existing_company.id
+                company = self.db_service.update_company(company)
+            else:
+                company = self.db_service.create_company(company)
+            
+            if not company:
+                print("❌ 기업 정보 저장 실패")
+                return
+            
+            # 분석 결과 저장
+            analysis = Analysis(
+                company_id=company.id,
+                company_name=company_name,
+                homepage=homepage,
+                email=email,
+                summary=result.get('summary', ''),
+                risks=ai_analysis.get('risks', []),
+                certifications=ai_analysis.get('certifications', []),
+                news_data=public_data.get('news', []),
+                dart_data=public_data.get('dart', []),
+                social_data=public_data.get('social', []),
+                website_data=public_data.get('website', {}),
+                analysis_method=ai_analysis.get('analysis_method', 'AI (GPT-4o-mini)'),
+                confidence_score=ai_analysis.get('confidence_score', 0.85),
+                crawl_status=public_data.get('status', 'success')
+            )
+            
+            saved_analysis = self.db_service.create_analysis(analysis)
+            if saved_analysis:
+                print(f"✅ {company_name} 분석 결과가 데이터베이스에 저장되었습니다.")
+            else:
+                print(f"❌ {company_name} 분석 결과 저장 실패")
+                
+        except Exception as e:
+            print(f"❌ 데이터베이스 저장 중 오류: {str(e)}")
     
     def _get_current_date(self) -> str:
         """현재 날짜 반환"""
