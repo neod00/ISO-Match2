@@ -6,6 +6,7 @@ import re
 from urllib.parse import urlparse
 from typing import Dict, List, Optional
 from .crawler import CrawlerService
+from .ai_analyzer import AIAnalyzer
 
 class CompanyAnalyzer:
     """기업 분석 서비스 클래스"""
@@ -13,6 +14,7 @@ class CompanyAnalyzer:
     def __init__(self):
         self.analyzer_name = "InsightMatch2 Analyzer"
         self.crawler = CrawlerService()
+        self.ai_analyzer = AIAnalyzer()
     
     def analyze(self, homepage: str, email: str) -> Dict:
         """
@@ -33,32 +35,25 @@ class CompanyAnalyzer:
             print(f"🔍 {company_name} 공개정보 수집 시작...")
             public_data = self.crawler.crawl_public_data(homepage, company_name)
             
-            # 분석 결과 생성
+            # AI 분석 실행
+            print(f"🤖 {company_name} AI 분석 시작...")
+            ai_analysis = self.ai_analyzer.analyze_company_risks(public_data)
+            
+            # 분석 결과 통합
             result = {
                 'company': company_name,
                 'homepage': homepage,
                 'email': email,
-                'summary': f'{company_name}의 공개자료 기반으로 보안·품질·환경 리스크가 식별되었습니다.',
-                'risks': [
-                    '정보보안 정책/절차 미흡',
-                    '개인정보 처리방침 최신화 필요',
-                    '공급망 리스크 모니터링 필요',
-                    '경영 공시의 투명성 개선 필요',
-                    '환경 규제 대응 체계 보완 필요'
-                ],
-                'certifications': [
-                    'ISO 27001',
-                    'ISO 9001',
-                    'ISO 14001',
-                    'ISO 27701',
-                    'GDPR 컴플라이언스'
-                ],
+                'summary': ai_analysis.get('summary', f'{company_name}의 공개자료 기반으로 보안·품질·환경 리스크가 식별되었습니다.'),
+                'risks': self._format_risks(ai_analysis.get('risks', [])),
+                'certifications': self._format_certifications(ai_analysis.get('certifications', [])),
                 'news': public_data.get('news', []),
                 'dart': public_data.get('dart', []),
                 'social': public_data.get('social', []),
                 'website': public_data.get('website', {}),
-                'analysis_date': self._get_current_date(),
-                'confidence_score': 0.85,
+                'analysis_date': ai_analysis.get('analysis_date', self._get_current_date()),
+                'confidence_score': ai_analysis.get('confidence_score', 0.85),
+                'analysis_method': ai_analysis.get('analysis_method', 'Unknown'),
                 'crawl_status': public_data.get('status', 'unknown')
             }
             
@@ -146,6 +141,60 @@ class CompanyAnalyzer:
                 'date': '2024-01-12'
             }
         ]
+    
+    def _format_risks(self, risks: List[Dict]) -> List[str]:
+        """리스크 데이터 포맷팅"""
+        if not risks:
+            return [
+                '정보보안 정책/절차 미흡',
+                '개인정보 처리방침 최신화 필요',
+                '공급망 리스크 모니터링 필요',
+                '경영 공시의 투명성 개선 필요',
+                '환경 규제 대응 체계 보완 필요'
+            ]
+        
+        formatted_risks = []
+        for risk in risks:
+            if isinstance(risk, dict):
+                item = risk.get('item', 'Unknown Risk')
+                priority = risk.get('priority', 'Medium')
+                description = risk.get('description', '')
+                
+                if description:
+                    formatted_risks.append(f"{item} ({priority}): {description}")
+                else:
+                    formatted_risks.append(f"{item} ({priority})")
+            else:
+                formatted_risks.append(str(risk))
+        
+        return formatted_risks[:10]  # 최대 10개
+    
+    def _format_certifications(self, certifications: List[Dict]) -> List[str]:
+        """인증 데이터 포맷팅"""
+        if not certifications:
+            return [
+                'ISO 27001',
+                'ISO 9001',
+                'ISO 14001',
+                'ISO 27701',
+                'GDPR 컴플라이언스'
+            ]
+        
+        formatted_certs = []
+        for cert in certifications:
+            if isinstance(cert, dict):
+                item = cert.get('item', 'Unknown Certification')
+                priority = cert.get('priority', 'Medium')
+                description = cert.get('description', '')
+                
+                if description:
+                    formatted_certs.append(f"{item} ({priority}): {description}")
+                else:
+                    formatted_certs.append(f"{item} ({priority})")
+            else:
+                formatted_certs.append(str(cert))
+        
+        return formatted_certs[:10]  # 최대 10개
     
     def _get_current_date(self) -> str:
         """현재 날짜 반환"""
