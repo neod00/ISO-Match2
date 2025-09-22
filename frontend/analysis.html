@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기업 분석 - InsightMatch2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html">InsightMatch2</a>
+            <nav class="nav">
+                <a href="analysis.html" aria-current="page">기업 분석</a>
+                <a href="consultants.html">컨설턴트 찾기</a>
+                <a href="about.html">서비스 소개</a>
+                <a href="consultant-register.html">컨설턴트 등록</a>
+                <a class="btn btn-primary" href="analysis.html">시작하기</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="section">
+        <div class="container">
+            <header class="section-head">
+                <h1>기업 분석</h1>
+                <p>홈페이지 URL과 이메일을 입력하면 AI가 분석을 시작합니다.</p>
+            </header>
+
+            <!-- Analysis Form -->
+            <form id="analysis-form" class="card analysis-form">
+                <div class="form-group">
+                    <label for="homepage">홈페이지 URL</label>
+                    <input type="url" id="homepage" name="homepage" required placeholder="https://example.com">
+                </div>
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" id="email" name="email" required placeholder="you@example.com">
+                </div>
+                <button class="btn btn-primary" type="submit">
+                    <span class="btn-text">무료 분석 시작하기</span>
+                    <span class="btn-loading" style="display: none;">분석 중...</span>
+                </button>
+            </form>
+
+            <!-- Analysis Result -->
+            <section id="analysis-result" class="section" style="display: none;">
+                <div class="analysis-header">
+                    <h2>분석 결과</h2>
+                    <div class="analysis-meta">
+                        <span id="analysis-company"></span>
+                        <span id="analysis-date"></span>
+                        <span id="analysis-method"></span>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid-3">
+                    <article class="card">
+                        <h3>핵심 요약</h3>
+                        <p id="summary">-</p>
+                    </article>
+                    <article class="card">
+                        <h3>리스크 포인트</h3>
+                        <ul id="risks"></ul>
+                    </article>
+                    <article class="card">
+                        <h3>권장 인증</h3>
+                        <ul id="certifications"></ul>
+                    </article>
+                </div>
+
+                <!-- Data Sources -->
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <article class="card">
+                        <div class="card-header">
+                            <h3>전자공시 (DART)</h3>
+                            <div class="filter-group">
+                                <label for="dart-filter" class="sr-only">공시유형</label>
+                                <select id="dart-filter">
+                                    <option value="">전체</option>
+                                    <option value="정기">정기</option>
+                                    <option value="수시">수시</option>
+                                    <option value="기타">기타</option>
+                                </select>
+                            </div>
+                        </div>
+                        <ul id="dart-list"></ul>
+                        <div class="card-footer">
+                            <a id="dart-more" class="btn btn-ghost" href="#" target="_blank" rel="noopener">DART에서 더보기</a>
+                        </div>
+                    </article>
+                    <article class="card">
+                        <h3>공개 뉴스</h3>
+                        <ul id="news-list"></ul>
+                    </article>
+                </div>
+
+                <!-- Actions -->
+                <div class="analysis-actions">
+                    <a id="proceed-link" class="btn btn-primary" href="consultants.html">진행하기</a>
+                    <button class="btn btn-ghost" type="button" onclick="window.print()">제안서 다운로드(PDF)</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container copyright">© 2024 InsightMatch2. All rights reserved.</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

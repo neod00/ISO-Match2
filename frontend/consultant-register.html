@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컨설턴트 등록 - InsightMatch2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html">InsightMatch2</a>
+            <nav class="nav">
+                <a href="analysis.html">기업 분석</a>
+                <a href="consultants.html">컨설턴트 찾기</a>
+                <a href="about.html">서비스 소개</a>
+                <a href="consultant-register.html" aria-current="page">컨설턴트 등록</a>
+                <a class="btn btn-primary" href="analysis.html">시작하기</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="section">
+        <div class="container">
+            <header class="section-head">
+                <h1>컨설턴트 등록</h1>
+                <p>전문 컨설턴트로 등록하여 새로운 기회를 만들어보세요.</p>
+            </header>
+
+            <!-- Registration Form -->
+            <form id="register-form" class="card registration-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">이름 *</label>
+                        <input type="text" id="name" name="name" required placeholder="홍길동">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">이메일 *</label>
+                        <input type="email" id="email" name="email" required placeholder="hong@example.com">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">연락처</label>
+                        <input type="tel" id="phone" name="phone" placeholder="010-1234-5678">
+                    </div>
+                    <div class="form-group">
+                        <label for="years">경력 (년) *</label>
+                        <input type="number" id="years" name="years" required min="0" max="50" placeholder="5">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="industry">전문 업종 *</label>
+                    <select id="industry" name="industry" required>
+                        <option value="">업종을 선택하세요</option>
+                        <option value="IT">IT</option>
+                        <option value="제조">제조</option>
+                        <option value="바이오/헬스">바이오/헬스</option>
+                        <option value="교육">교육</option>
+                        <option value="금융">금융</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="region">활동 지역 *</label>
+                    <select id="region" name="region" required>
+                        <option value="">지역을 선택하세요</option>
+                        <option value="서울">서울</option>
+                        <option value="경기">경기</option>
+                        <option value="부산">부산</option>
+                        <option value="대구">대구</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="certifications">보유 인증 *</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="certifications" value="ISO 27001">
+                            <span>ISO 27001 (정보보안)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="certifications" value="ISO 9001">
+                            <span>ISO 9001 (품질관리)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="certifications" value="ISO 14001">
+                            <span>ISO 14001 (환경경영)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="certifications" value="ISO 27701">
+                            <span>ISO 27701 (개인정보보호)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="certifications" value="GDPR">
+                            <span>GDPR 컴플라이언스</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="certifications" value="ISO 45001">
+                            <span>ISO 45001 (안전보건)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">자기소개</label>
+                    <textarea id="description" name="description" rows="4" placeholder="전문 분야와 경험을 간단히 소개해주세요."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">등록 신청</button>
+                    <button class="btn btn-ghost" type="button" onclick="resetForm()">초기화</button>
+                </div>
+            </form>
+
+            <!-- Success Message -->
+            <div id="register-success" class="success-message" style="display: none;">
+                <div class="success-content">
+                    <h3>등록 신청이 완료되었습니다!</h3>
+                    <p>검토 후 승인되면 이메일로 연락드리겠습니다.</p>
+                    <a class="btn btn-primary" href="consultants.html">컨설턴트 목록 보기</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container copyright">© 2024 InsightMatch2. All rights reserved.</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

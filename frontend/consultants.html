@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컨설턴트 찾기 - InsightMatch2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html">InsightMatch2</a>
+            <nav class="nav">
+                <a href="analysis.html">기업 분석</a>
+                <a href="consultants.html" aria-current="page">컨설턴트 찾기</a>
+                <a href="about.html">서비스 소개</a>
+                <a href="consultant-register.html">컨설턴트 등록</a>
+                <a class="btn btn-primary" href="analysis.html">시작하기</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="section">
+        <div class="container">
+            <header class="section-head">
+                <h1>컨설턴트 찾기</h1>
+                <p>전문 분야별 컨설턴트를 찾아보세요.</p>
+            </header>
+
+            <!-- Filters -->
+            <div class="filters card">
+                <div class="filter-group">
+                    <label for="filter-industry">업종</label>
+                    <select id="filter-industry">
+                        <option value="">전체</option>
+                        <option value="IT">IT</option>
+                        <option value="제조">제조</option>
+                        <option value="바이오/헬스">바이오/헬스</option>
+                        <option value="교육">교육</option>
+                        <option value="금융">금융</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-cert">인증</label>
+                    <select id="filter-cert">
+                        <option value="">전체</option>
+                        <option value="ISO 27001">ISO 27001</option>
+                        <option value="ISO 9001">ISO 9001</option>
+                        <option value="ISO 14001">ISO 14001</option>
+                        <option value="ISO 27701">ISO 27701</option>
+                        <option value="GDPR">GDPR</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-region">지역</label>
+                    <select id="filter-region">
+                        <option value="">전체</option>
+                        <option value="서울">서울</option>
+                        <option value="경기">경기</option>
+                        <option value="부산">부산</option>
+                        <option value="대구">대구</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <button class="btn btn-ghost" type="button" onclick="clearFilters()">필터 초기화</button>
+            </div>
+
+            <!-- Results Count -->
+            <div class="results-header">
+                <h3>검색 결과</h3>
+                <span id="results-count">0명의 컨설턴트</span>
+            </div>
+
+            <!-- Consultant List -->
+            <div id="consultant-list" class="consultant-grid">
+                <!-- Consultants will be loaded here -->
+            </div>
+
+            <!-- No Results -->
+            <div id="no-results" class="no-results" style="display: none;">
+                <div class="no-results-content">
+                    <h3>검색 결과가 없습니다</h3>
+                    <p>다른 조건으로 검색해보세요.</p>
+                    <button class="btn btn-primary" onclick="clearFilters()">필터 초기화</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container copyright">© 2024 InsightMatch2. All rights reserved.</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
